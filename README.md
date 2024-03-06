@@ -14,6 +14,7 @@ The tasks presented on the aforementioned page allow me to develop my SQL skills
 - Window functions (ROW_NUMBER, DENSE_RANK)
 - CASE WHEN statments
 - Subqueries
+- Data cleaning/preparation
 
 
 ## Case Study #1 - Danny's Diner
