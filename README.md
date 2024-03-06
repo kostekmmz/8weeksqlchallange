@@ -1,6 +1,6 @@
 # 8WeekSQLChallange
 Data with danny 8 week SQL Challange
-https://8weeksqlchallenge.com/ 
+<b>[#8WeekSQLChallenge](https://8weeksqlchallenge.com/ )</b>
 
 
 In this project I use SQL solving case studies created by Danny Ma. 
