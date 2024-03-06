@@ -16,6 +16,9 @@ The tasks presented on the aforementioned page allow me to develop my SQL skills
 - Subqueries
 - Data cleaning/preparation
 
+## Solved Tasks: 
+- [Case Study #1 - Danny's Diner](https://github.com/kostekmmz/8weeksqlchallange/tree/main/Case%20Study%20%231-%20Danny's%20Diner)
+- [Case Study #2 - Pizza Runner](https://github.com/kostekmmz/8weeksqlchallange/blob/main/Case%20Study%20%232%20Pizza%20Runner/Solving.md)
 
 ## Case Study #1 - Danny's Diner
 [SOLUTIONS](https://github.com/kostekmmz/8weeksqlchallange/tree/main/Case%20Study%20%231-%20Danny's%20Diner)
