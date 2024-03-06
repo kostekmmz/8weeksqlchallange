@@ -33,5 +33,40 @@ FROM customer_orders);
 <b>Table after cleaning:</b>
   ![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/c5a2dc94-be7c-423a-bbe4-15a56f4fb2f1)
 
+  As we can see in `runner_orders` we also have the inquities
+  - In `distance` column we can see distances with 'km'
+  - In `duration` column we can see duration with 'mins', 'minute' and 'minutes'
 
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/f130c42f-35bd-47ee-bac1-4a1b6f9384c8)
 
+<b>Creating new table with clean data:</b>
+````sql
+DROP TABLE IF EXISTS runner_orders_prep;
+CREATE TABLE runner_orders_prep as
+select 
+"order_id",
+"runner_id",
+CASE
+    WHEN "pickup_time" LIKE 'null' then ''
+ELSE "pickup_time"
+END as "pickup_time",
+CASE 
+    WHEN "distance" LIKE '%km' then  TRIM("distance",'%km')
+    WHEN "distance" LIKE 'null' then ' '
+ELSE "distance"
+END AS "distance",
+CASE 
+    WHEN "duration" LIKE '%minutes' then TRIM("duration", '%minutes')
+    WHEN "duration" LIKE '%mins' then TRIM("duration", '%mins')
+    WHEN "duration" LIKE '%minute' then TRIM("duration", '%minute')
+    WHEN "duration" LIKE 'null' then ' '
+ELSE "duration"
+END AS "duration",
+CASE 
+    WHEN "cancellation" IS null or "cancellation" LIKE 'null' then ' ' 
+ELSE "cancellation"
+END as "cancellation"
+FROM runner_orders
+````
+<b>Table after cleaning:</b>
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/8bf91487-62fb-4bdc-b613-ef2f501a78ac)
