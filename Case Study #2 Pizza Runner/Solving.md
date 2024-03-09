@@ -70,3 +70,128 @@ FROM runner_orders
 ````
 <b>Table after cleaning:</b>
 ![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/8bf91487-62fb-4bdc-b613-ef2f501a78ac)
+
+# Case Study Questions
+### A. Pizza Metrics
+1. How many pizzas were ordered?
+2. How many unique customer orders were made?
+3. How many successful orders were delivered by each runner?
+4. How many of each type of pizza was delivered?
+5. How many Vegetarian and Meatlovers were ordered by each customer?
+6. What was the maximum number of pizzas delivered in a single order?
+7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+8. How many pizzas were delivered that had both exclusions and extras?
+9. What was the total volume of pizzas ordered for each hour of the day?
+10. What was the volume of orders for each day of the week?
+    
+***
+**1. How many pizzas were ordered?**
+```sql
+SELECT 
+COUNT("pizza_id") as volume
+FROM customer_orders_prep;
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/efb000a8-34de-4c98-9cd4-daad86ad14b7)
+
+**2. How many unique customer orders were made?**
+```sql
+SELECT
+COUNT(DISTINCT "customer_id") AS unique_customers
+FROM customer_orders_prep;
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/3a027748-3c72-41b0-90ae-fcae57786720)
+
+**3. How many successful orders were delivered by each runner?**
+   
+ ```sql
+SELECT "runner_id", count("order_id") AS count_successful
+from runner_orders_prep
+WHERE "pickup_time" <> ''
+GROUP BY "runner_id"
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/145cfa0b-532c-4448-93c0-9ea93ff42323)
+
+**4.How many of each type of pizza was delivered?**
+   ```sql
+SELECT co."pizza_id",
+count(co."order_id") as volume
+FROM customer_orders_prep co
+JOIN runner_orders_prep ro ON co."order_id"= ro."order_id"
+WHERE ro."pickup_time" <> ''
+GROUP BY  "pizza_id"
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/74a5f895-8987-4896-b498-9563e4f8e442)
+
+**5. How many Vegetarian and Meatlovers were ordered by each customer?**
+  ```sql
+   SELECT 
+co."customer_id",
+p."pizza_name",
+count(co."order_id") AS volume,
+FROM pizza_names p 
+JOIN customer_orders_prep co ON p."pizza_id" = co."pizza_id"
+GROUP BY co."customer_id", p."pizza_name"
+ORDER BY "customer_id"
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/2a4642ea-4bd7-4243-885c-70307c3477a0)
+
+**6.What was the maximum number of pizzas delivered in a single order?**
+   ```sql
+   SELECT 
+max(counted) AS maximum
+FROM 
+(SELECT count("pizza_id") as counted, co."order_id"
+FROM customer_orders_prep co
+JOIN runner_orders_prep ro ON co."order_id"= ro."order_id"
+WHERE ro."pickup_time" <> ''
+GROUP BY co."order_id")
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/59f3af4d-3e9e-4f15-be15-1da844d8adc2)
+
+**7.For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
+   ```sql
+    SELECT 
+"customer_id",
+SUM(CASE 
+WHEN co."EXCLUSIONS" = '' AND co."EXTRAS" = '' then 1
+END) as not_changed,
+SUM(CASE 
+WHEN co."EXCLUSIONS" <> '' OR co."EXTRAS" <> '' then 1-- changed
+END) changed
+FROM customer_orders_prep co
+JOIN runner_orders_prep ro ON co."order_id"= ro."order_id"
+WHERE ro."pickup_time" <> ''
+GROUP BY "customer_id"
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/6d90ca45-15d4-493f-9fb1-d99a18913e0f)
+
+**8.How many pizzas were delivered that had both exclusions and extras?**
+   ```sql
+    SELECT count(co."order_id") as pizzas
+FROM customer_orders_prep co
+JOIN runner_orders_prep ro ON co."order_id"= ro."order_id"
+WHERE co."EXCLUSIONS" <> '' 
+AND co."EXTRAS" <> ''
+AND ro."pickup_time" <> ''
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/6487ca77-9ca6-446c-8bc4-4ad269ffb3b6)
+
+**9.What was the total volume of pizzas ordered for each hour of the day?**
+   ```sql
+    SELECT count(hour("order_time")) as volume,
+hour("order_time") as each_hour
+FROM customer_orders_prep co
+group by each_hour
+order by each_hour desc 
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/68273b38-ab06-44a9-9401-e3c9629ab9c7)
+
+**10. What was the volume of orders for each day of the week?**
+  ```sql
+    SELECT count(date_part(day,"order_time")) as volume,
+date_part(day,"order_time") as each_day
+FROM customer_orders_prep co
+group by each_day
+order by each_day desc 
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/df3f9e99-e0d6-406c-9bb1-4c3964285427)
