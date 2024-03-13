@@ -195,3 +195,81 @@ group by each_day
 order by each_day desc 
 ````
 ![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/df3f9e99-e0d6-406c-9bb1-4c3964285427)
+
+
+### B. Runner and Customer Experience
+
+**1.How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
+   
+   ```sql
+   select count("runner_id") from runners 
+where "registration_date" between '2021-01-01' and '2021-01-08'
+````
+
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/998836a2-c613-4266-bc8a-808b75e41924)
+
+**2.What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
+
+The hardest thing in this case was the mystery how to change pickup_time from string to timestamp, but snowflake has an function to change that which is try_to_timestamp
+```sql
+SELECT "runner_id", round(avg("differnced"),2)
+from (
+SELECT
+"runner_id",
+try_to_timestamp(rop."pickup_time") as "pickup_time1",
+cop."order_time",
+datediff('minute',"order_time","pickup_time1") as "differnced"
+FROM
+  runner_orders_prep rop
+JOIN
+  customer_orders_prep cop ON rop."order_id" = cop."order_id"
+ where "pickup_time1" IS NOT NULL
+ )
+ group by "runner_id"
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/e03fb370-9d30-403f-9242-c439147d9b3a)
+
+
+**3.Is there any relationship between the number of pizzas and how long the order takes to prepare?**
+```sql
+SELECT "pizzas", avg("differenced")
+FROM
+(
+SELECT
+"order_id",
+count("order_id") as "pizzas",
+"differenced"
+FROM(
+SELECT
+cop."order_id",
+"pizza_id",
+try_to_timestamp("pickup_time") as "pickup_time1",
+cop."order_time",
+datediff('minute',"order_time","pickup_time1") as "differenced"
+FROM
+  runner_orders_prep rop
+JOIN
+  customer_orders_prep cop ON rop."order_id" = cop."order_id"
+ where "pickup_time1" IS NOT NULL
+)
+group by 
+"order_id",
+"differenced"
+ )
+ group by "pizzas"
+````
+ ![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/e38ef182-52d8-4921-b28e-d8f51eb39e19)
+
+**5.What was the average distance travelled for each customer?**
+```sql   
+ select round(avg(try_to_decimal(rop."distance")),1) as "dist", cop."customer_id"
+ from runner_orders_prep rop
+ join customer_orders_prep cop ON rop."order_id" = cop."order_id"
+group by cop."customer_id"
+````
+![image](https://github.com/kostekmmz/8weeksqlchallange/assets/148641524/90b75708-c406-4aa9-93fa-3b108b2c7d90)
+
+
+ What was the difference between the longest and shortest delivery times for all orders?
+What was the average speed for each runner for each delivery and do you notice any trend for these values?
+ What is the successful delivery percentage for each runner?
